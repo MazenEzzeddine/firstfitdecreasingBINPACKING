@@ -38,10 +38,6 @@ public class Main {
         Consumer consumer = null;
 
         for (Partition partition : partitions) {
-            if (consumer != null) {
-                consumers.add(consumer);
-                consumer = null;
-            }
             for (Consumer cons : consumers) {
                 if (cons.getRemainingSize() >= partition.getLag()) {
                     cons.assignPartition(partition);
@@ -56,10 +52,13 @@ public class Main {
                     consumer.assignPartition(partition);
                     consumerCount++;
                 }
-
             }
-            //if we reach here no consumer can fit the lag of the current partition
-            //let's open ( add a consumer instance ) a new consumer
+
+            // account for a consumers added for the last partition
+            if (consumer != null) {
+                consumers.add(consumer);
+                consumer = null;
+            }
 
         }
         //TODO look at the case when a lag does not fit any consumer
